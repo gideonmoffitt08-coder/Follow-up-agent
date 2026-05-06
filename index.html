@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Follow-Up Email Agent</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #0f0e0c;
+  --paper: #f7f3ec;
+  --cream: #ede8de;
+  --border: #d4cdc0;
+  --accent: #c4501a;
+  --accent2: #1a4f6e;
+  --muted: #8a8278;
+  --text: #1a1814;
+  --serif: 'Playfair Display', Georgia, serif;
+  --sans: 'DM Sans', sans-serif;
+  --mono: 'DM Mono', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--paper);
+  color: var(--text);
+  font-family: var(--sans);
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Texture overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.5;
+}
+
+.wrap { max-width: 780px; margin: 0 auto; padding: 52px 24px 80px; position: relative; z-index: 1; }
+
+/* Masthead */
+.masthead {
+  border-top: 3px solid var(--ink);
+  border-bottom: 1px solid var(--border);
+  padding: 20px 0 16px;
+  margin-bottom: 48px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+.masthead-left { flex: 1; }
+.masthead-eyebrow {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.masthead h1 {
+  font-family: var(--serif);
+  font-size: clamp(1.8rem, 5vw, 2.8rem);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.masthead h1 em {
+  font-style: italic;
+  color: var(--accent);
+}
+.masthead-right {
+  text-align: right;
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  color: var(--muted);
+  line-height: 1.8;
+  letter-spacing: 0.05em;
+}
+
+/* Outcome selector */
+.outcome-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 32px;
+}
+@media(max-width:500px){ .outcome-grid { grid-template-columns: 1fr; } }
+
+.outcome-card {
+  border: 1.5px solid var(--border);
+  border-radius: 4px;
+  padding: 16px 14px;
+  cursor: pointer;
+  transition: all 0.18s;
+  background: white;
+  position: relative;
+  overflow: hidden;
+}
+.outcome-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--border);
+  transition: background 0.18s;
+}
+.outcome-card:hover { border-color: var(--ink); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+.outcome-card.selected { border-color: var(--ink); }
+.outcome-card.selected.interested::before { background: #16a34a; }
+.outcome-card.selected.maybe::before { background: var(--accent2); }
+.outcome-card.selected.no::before { background: var(--accent); }
+.outcome-card.interested:hover::before { background: #16a34a; }
+.outcome-card.maybe:hover::before { background: var(--accent2); }
+.outcome-card.no:hover::before { background: var(--accent); }
+.outcome-icon { font-size: 1.5rem; margin-bottom: 8px; }
+.outcome-label { font-family: var(--serif); font-size: 0.95rem; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+.outcome-desc { font-size: 0.7rem; color: var(--muted); line-height: 1.5; }
+.outcome-card input[type="radio"] { display: none; }
+
+/* Form */
+.form-section {
+  background: white;
+  border: 1.5px solid var(--border);
+  border-radius: 4px;
+  padding: 28px;
+  margin-bottom: 20px;
+  position: relative;
+}
+.form-section::before {
+  content: attr(data-label);
+  position: absolute;
+  top: -10px;
+  left: 20px;
+  background: white;
+  padding: 0 8px;
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.fg { display: flex; flex-direction: column; gap: 7px; margin-bottom: 18px; }
+.fg:last-child { margin-bottom: 0; }
+.fg label {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.fg input, .fg textarea, .fg select {
+  background: var(--paper);
+  border: 1.5px solid var(--border);
+  border-radius: 2px;
+  padding: 11px 13px;
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 0.85rem;
+  outline: none;
+  transition: border-color 0.15s;
+  width: 100%;
+}
+.fg input:focus, .fg textarea:focus, .fg select:focus { border-color: var(--ink); background: white; }
+.fg input::placeholder, .fg textarea::placeholder { color: var(--muted); opacity: 0.6; }
+.fg textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media(max-width:500px){ .grid2 { grid-template-columns: 1fr; } }
+
+/* Buttons */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--ink);
+  color: var(--paper);
+  border: none;
+  padding: 14px 28px;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.18s;
+  border-radius: 2px;
+}
+.btn-primary:hover:not(:disabled) { background: var(--accent); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(196,80,26,0.3); }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  color: var(--muted);
+  border: 1.5px solid var(--border);
+  padding: 13px 24px;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.18s;
+  border-radius: 2px;
+}
+.btn-ghost:hover { border-color: var(--ink); color: var(--ink); }
+.btn-gmail {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #ea4335;
+  color: white;
+  border: none;
+  padding: 13px 24px;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.18s;
+  border-radius: 2px;
+  text-decoration: none;
+}
+.btn-gmail:hover { background: #c5221f; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(234,67,53,0.3); }
+.btn-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+
+/* Loading */
+.loading { display: none; text-align: center; padding: 60px 20px; }
+.loading.on { display: block; }
+.loading-spinner {
+  width: 40px; height: 40px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+  margin: 0 auto 20px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading p { font-family: var(--mono); font-size: 0.7rem; color: var(--muted); letter-spacing: 0.05em; }
+
+/* Output */
+.output { display: none; }
+.output.on { display: block; }
+
+.output-header {
+  border-top: 3px solid var(--ink);
+  padding: 16px 0 12px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.output-header h2 {
+  font-family: var(--serif);
+  font-size: 1.4rem;
+  font-weight: 700;
+  font-style: italic;
+}
+.outcome-tag {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 100px;
+  border: 1.5px solid;
+}
+.outcome-tag.interested { color: #16a34a; border-color: #16a34a; background: rgba(22,163,74,0.08); }
+.outcome-tag.maybe { color: var(--accent2); border-color: var(--accent2); background: rgba(26,79,110,0.08); }
+.outcome-tag.no { color: var(--accent); border-color: var(--accent); background: rgba(196,80,26,0.08); }
+
+.email-card {
+  background: white;
+  border: 1.5px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+.email-meta {
+  background: var(--cream);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.email-meta-left { font-family: var(--mono); font-size: 0.65rem; color: var(--muted); line-height: 1.8; }
+.email-meta-left strong { color: var(--text); }
+.copy-btn {
+  padding: 5px 12px;
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: white;
+  color: var(--muted);
+  border-radius: 2px;
+  transition: all 0.15s;
+}
+.copy-btn:hover { border-color: var(--ink); color: var(--ink); }
+.copy-btn.copied { border-color: #16a34a; color: #16a34a; background: rgba(22,163,74,0.06); }
+.email-body {
+  padding: 24px;
+  font-size: 0.88rem;
+  line-height: 1.85;
+  color: var(--text);
+  white-space: pre-wrap;
+  font-family: var(--sans);
+}
+
+.strategy-card {
+  background: var(--cream);
+  border: 1.5px solid var(--border);
+  border-radius: 4px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.strategy-label {
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent2);
+  margin-bottom: 10px;
+}
+.strategy-text {
+  font-size: 0.82rem;
+  line-height: 1.7;
+  color: var(--text);
+}
+
+.divider { height: 1px; background: var(--border); margin: 24px 0; }
+
+.err {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: var(--accent);
+  margin-top: 10px;
+  display: none;
+  padding: 10px 14px;
+  background: rgba(196,80,26,0.06);
+  border: 1px solid rgba(196,80,26,0.2);
+  border-radius: 2px;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- Masthead -->
+  <div class="masthead">
+    <div class="masthead-left">
+      <div class="masthead-eyebrow">Yellow Wall Ventures</div>
+      <h1>Follow-Up<br><em>Email Agent</em></h1>
+    </div>
+    <div class="masthead-right">
+      COLD CALL<br>FOLLOW-UP<br>SYSTEM<br>v1.0
+    </div>
+  </div>
+
+  <!-- Form -->
+  <div id="formWrap">
+
+    <!-- Outcome selector -->
+    <div class="form-section" data-label="01 — Call Outcome">
+      <p style="font-size:0.82rem;color:var(--muted);margin-bottom:18px;line-height:1.6">How did the call go? Select the outcome and the agent will craft the right follow-up.</p>
+      <div class="outcome-grid">
+        <label class="outcome-card interested" id="card-interested">
+          <input type="radio" name="outcome" value="interested" onchange="selectOutcome('interested')"/>
+          <div class="outcome-icon">🟢</div>
+          <div class="outcome-label">They're Interested</div>
+          <div class="outcome-desc">They liked it, want to move forward or learn more</div>
+        </label>
+        <label class="outcome-card maybe" id="card-maybe">
+          <input type="radio" name="outcome" value="maybe" onchange="selectOutcome('maybe')"/>
+          <div class="outcome-icon">🟡</div>
+          <div class="outcome-label">Needs to Think</div>
+          <div class="outcome-desc">Not a no — they're considering it but hesitant</div>
+        </label>
+        <label class="outcome-card no" id="card-no">
+          <input type="radio" name="outcome" value="no" onchange="selectOutcome('no')"/>
+          <div class="outcome-icon">🔴</div>
+          <div class="outcome-label">Said No</div>
+          <div class="outcome-desc">Not interested right now — leave the door open</div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Business info -->
+    <div class="form-section" data-label="02 — Business Info">
+      <div class="grid2">
+        <div class="fg">
+          <label>Business Name *</label>
+          <input id="bizName" placeholder="e.g. Maria's Bakery"/>
+        </div>
+        <div class="fg">
+          <label>Owner Name *</label>
+          <input id="ownerName" placeholder="e.g. Maria"/>
+        </div>
+        <div class="fg">
+          <label>Their Email (optional)</label>
+          <input type="email" id="clientEmail" placeholder="e.g. maria@email.com"/>
+        </div>
+        <div class="fg">
+          <label>Business Type</label>
+          <input id="bizType" placeholder="e.g. Bakery, Auto Repair"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- Call notes -->
+    <div class="form-section" data-label="03 — Call Notes">
+      <div class="fg">
+        <label>What did they say? *</label>
+        <textarea id="callNotes" placeholder="e.g. She liked the idea but said she's worried about the cost. Mentioned she's been burned by a bad web designer before. Has a Facebook page but no real website."></textarea>
+      </div>
+      <div class="fg">
+        <label>Their main objection or concern</label>
+        <input id="objection" placeholder="e.g. Too expensive, not the right time, already has someone"/>
+      </div>
+      <div class="fg">
+        <label>Anything personal they mentioned (optional)</label>
+        <input id="personal" placeholder="e.g. Has a daughter, mentioned they've been open 5 years"/>
+      </div>
+    </div>
+
+    <!-- API Key -->
+    <div class="form-section" data-label="04 — API Key">
+      <div class="fg" style="margin-bottom:0">
+        <label>Claude API Key</label>
+        <input type="password" id="apiKey" placeholder="sk-ant-api03-..."/>
+      </div>
+      <div style="font-size:0.65rem;color:var(--muted);margin-top:8px;font-family:var(--mono)">Saved in your browser. Never sent anywhere except Anthropic.</div>
+    </div>
+
+    <div class="btn-row" style="margin-top:4px">
+      <button class="btn-primary" onclick="generate()">▶ Generate Follow-Up</button>
+      <button class="btn-ghost" onclick="clearForm()">✕ Clear</button>
+    </div>
+    <div class="err" id="errMsg"></div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading" id="loadingWrap">
+    <div class="loading-spinner"></div>
+    <p>Agent is crafting your follow-up...</p>
+  </div>
+
+  <!-- Output -->
+  <div class="output" id="outputWrap">
+    <div class="output-header">
+      <h2>Your Follow-Up Email</h2>
+      <span class="outcome-tag" id="outcomeTag"></span>
+    </div>
+
+    <div class="strategy-card" id="strategyCard">
+      <div class="strategy-label">🧠 Agent Strategy</div>
+      <div class="strategy-text" id="strategyText"></div>
+    </div>
+
+    <div class="email-card">
+      <div class="email-meta">
+        <div class="email-meta-left">
+          <div><strong>To:</strong> <span id="metaTo">—</span></div>
+          <div><strong>Subject:</strong> <span id="metaSubject">—</span></div>
+          <div><strong>Send within:</strong> <span id="metaTiming">—</span></div>
+        </div>
+        <button class="copy-btn" id="copyBtn" onclick="copyEmail()">Copy Email</button>
+      </div>
+      <div class="email-body" id="emailBody"></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="btn-row">
+      <a class="btn-gmail" id="gmailBtn" href="#" target="_blank">✉ Open in Gmail</a>
+      <button class="btn-ghost" onclick="resetForm()">← New Follow-Up</button>
+    </div>
+  </div>
+
+</div>
+<script>
+var selectedOutcome = '';
+
+// Persist API key
+var akEl = document.getElementById('apiKey');
+var saved = localStorage.getItem('fua_ak');
+if (saved) akEl.value = saved;
+akEl.addEventListener('change', function(){ localStorage.setItem('fua_ak', akEl.value); });
+
+function selectOutcome(val) {
+  selectedOutcome = val;
+  ['interested','maybe','no'].forEach(function(o){
+    document.getElementById('card-' + o).classList.toggle('selected', o === val);
+  });
+}
+
+function showErr(msg) {
+  var e = document.getElementById('errMsg');
+  e.textContent = msg;
+  e.style.display = msg ? 'block' : 'none';
+}
+
+async function generate() {
+  var apiKey = akEl.value.trim();
+  var bizName = document.getElementById('bizName').value.trim();
+  var ownerName = document.getElementById('ownerName').value.trim();
+  var clientEmail = document.getElementById('clientEmail').value.trim();
+  var bizType = document.getElementById('bizType').value.trim();
+  var callNotes = document.getElementById('callNotes').value.trim();
+  var objection = document.getElementById('objection').value.trim();
+  var personal = document.getElementById('personal').value.trim();
+
+  if (!apiKey) return showErr('Please enter your Claude API key');
+  if (!selectedOutcome) return showErr('Please select a call outcome');
+  if (!bizName) return showErr('Business name is required');
+  if (!ownerName) return showErr('Owner name is required');
+  if (!callNotes) return showErr('Please add some call notes');
+
+  showErr('');
+  document.getElementById('formWrap').style.display = 'none';
+  document.getElementById('loadingWrap').classList.add('on');
+
+  var outcomeLabel = selectedOutcome === 'interested' ? 'They expressed interest and want to move forward' : selectedOutcome === 'maybe' ? 'They are considering it but hesitant' : 'They said no or not right now';
+  var toneGuide = selectedOutcome === 'interested' ? 'Warm, excited, professional. Reinforce their decision, confirm next steps clearly, make it easy to say yes.' : selectedOutcome === 'maybe' ? 'Understanding, low-pressure, reassuring. Address their hesitation directly without being pushy. Leave the door open.' : 'Gracious, brief, no hard feelings. Thank them for their time, leave a positive impression, mention you\'ll check back in a few months.';
+
+  var prompt = 'You are a sales follow-up assistant for Gideon Moffitt at Yellow Wall Ventures, a web design agency in Houston TX. Email: gideonmoffitt08@gmail.com\n\nCall details:\n- Business: ' + bizName + '\n- Owner: ' + ownerName + (clientEmail ? '\n- Email: ' + clientEmail : '') + '\n- Business type: ' + (bizType || 'small business') + '\n- Call outcome: ' + outcomeLabel + '\n- What they said: ' + callNotes + (objection ? '\n- Main objection: ' + objection : '') + (personal ? '\n- Personal details mentioned: ' + personal : '') + '\n\nTone guide: ' + toneGuide + '\n\nGenerate a follow-up email. Format EXACTLY like this:\n\nSTRATEGY_BEGIN\n[2 sentences explaining your approach for this specific situation and why]\nSTRATEGY_END\n\nSUBJECT_BEGIN\n[Email subject line]\nSUBJECT_END\n\nTIMING_BEGIN\n[When to send this — e.g. "Within 2 hours of the call" or "Tomorrow morning"]\nTIMING_END\n\nEMAIL_BEGIN\n[Full email body. Reference specific things they said. Sign as Gideon Moffitt, Yellow Wall Ventures. Max 150 words. No fluff.]\nEMAIL_END';
+
+  try {
+    var res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    if (!res.ok) {
+      var ed = await res.json();
+      throw new Error((ed.error && ed.error.message) || 'API error ' + res.status);
+    }
+
+    var data = await res.json();
+    var txt = data.content[0].text;
+
+    function extract(tag) {
+      var m = txt.match(new RegExp(tag + '_BEGIN([\\s\\S]*?)' + tag + '_END'));
+      return m ? m[1].trim() : '';
+    }
+
+    var strategy = extract('STRATEGY');
+    var subject = extract('SUBJECT');
+    var timing = extract('TIMING');
+    var emailBody = extract('EMAIL');
+
+    // Populate output
+    document.getElementById('strategyText').textContent = strategy || 'Personalized follow-up based on your call notes.';
+    document.getElementById('metaTo').textContent = clientEmail || ownerName + ' at ' + bizName;
+    document.getElementById('metaSubject').textContent = subject || 'Following up from our call';
+    document.getElementById('metaTiming').textContent = timing || 'Within 24 hours';
+    document.getElementById('emailBody').textContent = emailBody;
+
+    // Outcome tag
+    var tag = document.getElementById('outcomeTag');
+    tag.textContent = selectedOutcome === 'interested' ? '🟢 Interested' : selectedOutcome === 'maybe' ? '🟡 Needs to Think' : '🔴 Said No';
+    tag.className = 'outcome-tag ' + selectedOutcome;
+
+    // Gmail link
+    var gmailUrl = 'https://mail.google.com/mail/?view=cm&fs=1'
+      + '&to=' + encodeURIComponent(clientEmail || '')
+      + '&su=' + encodeURIComponent(subject || 'Following up from our call')
+      + '&body=' + encodeURIComponent(emailBody)
+      + '&from=' + encodeURIComponent('gideonmoffitt08@gmail.com');
+    document.getElementById('gmailBtn').href = gmailUrl;
+
+    document.getElementById('loadingWrap').classList.remove('on');
+    document.getElementById('outputWrap').classList.add('on');
+
+  } catch(e) {
+    document.getElementById('loadingWrap').classList.remove('on');
+    document.getElementById('formWrap').style.display = 'block';
+    showErr('Error: ' + e.message);
+  }
+}
+
+function copyEmail() {
+  var body = document.getElementById('emailBody').textContent;
+  var subject = document.getElementById('metaSubject').textContent;
+  var full = 'Subject: ' + subject + '\n\n' + body;
+  var btn = document.getElementById('copyBtn');
+  navigator.clipboard.writeText(full).then(function(){
+    btn.textContent = '✓ Copied';
+    btn.classList.add('copied');
+    setTimeout(function(){ btn.textContent = 'Copy Email'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+function resetForm() {
+  document.getElementById('outputWrap').classList.remove('on');
+  document.getElementById('formWrap').style.display = 'block';
+  selectedOutcome = '';
+  ['interested','maybe','no'].forEach(function(o){
+    document.getElementById('card-' + o).classList.remove('selected');
+  });
+}
+
+function clearForm() {
+  ['bizName','ownerName','clientEmail','bizType','callNotes','objection','personal'].forEach(function(id){
+    document.getElementById(id).value = '';
+  });
+  resetForm();
+}
+</script>
+</body>
+</html>
