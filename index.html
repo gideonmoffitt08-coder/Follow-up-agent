@@ -362,7 +362,7 @@ body::before {
   <!-- Masthead -->
   <div class="masthead">
     <div class="masthead-left">
-      <div class="masthead-eyebrow">Yellow Wall Ventures</div>
+      <div class="masthead-eyebrow">Ruby Wall Ventures</div>
       <h1>Follow-Up<br><em>Email Agent</em></h1>
     </div>
     <div class="masthead-right">
@@ -536,7 +536,7 @@ async function generate() {
   var outcomeLabel = selectedOutcome === 'interested' ? 'They expressed interest and want to move forward' : selectedOutcome === 'maybe' ? 'They are considering it but hesitant' : 'They said no or not right now';
   var toneGuide = selectedOutcome === 'interested' ? 'Warm, excited, professional. Reinforce their decision, confirm next steps clearly, make it easy to say yes.' : selectedOutcome === 'maybe' ? 'Understanding, low-pressure, reassuring. Address their hesitation directly without being pushy. Leave the door open.' : 'Gracious, brief, no hard feelings. Thank them for their time, leave a positive impression, mention you\'ll check back in a few months.';
 
-  var prompt = 'You are a sales follow-up assistant for Gideon Moffitt at Yellow Wall Ventures, a web design agency in Houston TX. Email: gideonmoffitt08@gmail.com\n\nCall details:\n- Business: ' + bizName + '\n- Owner: ' + ownerName + (clientEmail ? '\n- Email: ' + clientEmail : '') + '\n- Business type: ' + (bizType || 'small business') + '\n- Call outcome: ' + outcomeLabel + '\n- What they said: ' + callNotes + (objection ? '\n- Main objection: ' + objection : '') + (personal ? '\n- Personal details mentioned: ' + personal : '') + '\n\nTone guide: ' + toneGuide + '\n\nGenerate a follow-up email. Format EXACTLY like this:\n\nSTRATEGY_BEGIN\n[2 sentences explaining your approach for this specific situation and why]\nSTRATEGY_END\n\nSUBJECT_BEGIN\n[Email subject line]\nSUBJECT_END\n\nTIMING_BEGIN\n[When to send this — e.g. "Within 2 hours of the call" or "Tomorrow morning"]\nTIMING_END\n\nEMAIL_BEGIN\n[Full email body. Reference specific things they said. Sign as Gideon Moffitt, Yellow Wall Ventures. Max 150 words. No fluff.]\nEMAIL_END';
+  var prompt = 'You are a sales follow-up assistant for Gideon Moffitt at Ruby Wall Ventures, a web design agency in Houston TX. Email: gideonmoffitt08@gmail.com\n\nCall details:\n- Business: ' + bizName + '\n- Owner: ' + ownerName + (clientEmail ? '\n- Email: ' + clientEmail : '') + '\n- Business type: ' + (bizType || 'small business') + '\n- Call outcome: ' + outcomeLabel + '\n- What they said: ' + callNotes + (objection ? '\n- Main objection: ' + objection : '') + (personal ? '\n- Personal details mentioned: ' + personal : '') + '\n\nTone guide: ' + toneGuide + '\n\nGenerate a follow-up email. Format EXACTLY like this:\n\nSTRATEGY_BEGIN\n[2 sentences explaining your approach for this specific situation and why]\nSTRATEGY_END\n\nSUBJECT_BEGIN\n[Email subject line]\nSUBJECT_END\n\nTIMING_BEGIN\n[When to send this — e.g. "Within 2 hours of the call" or "Tomorrow morning"]\nTIMING_END\n\nEMAIL_BEGIN\n[Full email body. Reference specific things they said. Sign as Gideon Moffitt, Ruby Wall Ventures. Max 150 words. No fluff.]\nEMAIL_END';
 
   try {
     var res = await fetch('https://api.anthropic.com/v1/messages', {
